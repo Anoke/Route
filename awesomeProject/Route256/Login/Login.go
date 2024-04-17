@@ -6,45 +6,36 @@ import (
 	"os"
 )
 
-func similar(дщ, newLogin string) bool {
-	if login1 == login2 {
-		return true
-	}
-	if len(login1) != len(login2) {
+func similar(oldLogin, newLogin string) bool {
+
+	if len(oldLogin) != len(newLogin) {
 		return false
 	}
 
-	foundDifference := false
-	temp := 0
-	for i := 0; i < len(login1)-1; i++ {
-		if login1[i] != login2[i] {
-			if foundDifference {
-				return false
+	for i := 0; i < len(newLogin); i++ {
+		if newLogin[i] != oldLogin[i] && i != len(newLogin)-1 {
+			newLogin = newLogin[:i] + string(newLogin[i+1]) + string(newLogin[i]) + newLogin[i+2:]
+
+			if newLogin == oldLogin {
+				return true
 			}
 
-			if login1[i] == login2[i+1] && login1[i+1] == login2[i] {
-				foundDifference = true
-				temp = i
-			} else {
-				return false
-			}
-			i++
+			break
 		}
 	}
-	if login1[len(login1)-1] != login2[len(login2)-1] && len(login2)-1 != temp+1 && foundDifference {
-		return false
-	}
 
-	return foundDifference
+	return false
 }
 
 func main() {
 	var n int
 	fmt.Scan(&n)
 
-	currentLogins := make([]string, n)
+	currentLogins := make(map[string]bool, n)
 	for i := 0; i < n; i++ {
-		fmt.Scan(&currentLogins[i])
+		var login string
+		fmt.Scan(&login)
+		currentLogins[login] = true
 	}
 
 	var m int
@@ -57,18 +48,22 @@ func main() {
 		var newLogin string
 		fmt.Scan(&newLogin)
 
-		found := false
-		for _, currentLogin := range currentLogins {
-			if similar(currentLogin, newLogin) {
-				found = true
-				break
-			}
-		}
-
-		if found {
+		if currentLogins[newLogin] {
 			fmt.Fprintln(out, 1)
 		} else {
-			fmt.Fprintln(out, 0)
+			found := false
+			for currentLogin, _ := range currentLogins {
+				if similar(currentLogin, newLogin) {
+					found = true
+					break
+				}
+			}
+
+			if found {
+				fmt.Fprintln(out, 1)
+			} else {
+				fmt.Fprintln(out, 0)
+			}
 		}
 	}
 }
